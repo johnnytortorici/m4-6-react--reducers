@@ -1,10 +1,9 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Tippy from "@tippy.js/react";
-import "tippy.js/dist/tippy.css";
-import seat from "../assets/seat-available.svg";
 import { SeatContext } from "./SeatContext";
+
+import Seat from "./Seat";
 
 import { getRowName, getSeatNum } from "../helpers";
 import { range } from "../utils";
@@ -28,30 +27,27 @@ const TicketWidget = () => {
           const rowName = getRowName(rowIndex);
 
           return (
-            <Rows>
+            <Row key={rowIndex}>
               <RowLabel>Row {rowName}</RowLabel>
-              <Row key={rowIndex}>
+              <SeatsRow>
                 {range(seatsPerRow).map((seatIndex) => {
                   const seatId = `${rowName}-${getSeatNum(seatIndex)}`;
+                  const seat = state.seats[seatId];
 
                   return (
-                    <Tippy
-                      content={`Row ${rowName}, Seat ${getSeatNum(
-                        seatIndex
-                      )} - $${state.seats[seatId].price}`}
-                    >
-                      <SeatWrapper key={seatId}>
-                        <Seat
-                          src={seat}
-                          alt="Seat"
-                          isBooked={state.bookedSeats[seatId]}
-                        />
-                      </SeatWrapper>
-                    </Tippy>
+                    <Seat
+                      key={seatId}
+                      rowIndex={rowIndex}
+                      seatIndex={seatIndex}
+                      width={36}
+                      height={36}
+                      price={seat.price}
+                      isBooked={state.bookedSeats[seatId]}
+                    />
                   );
                 })}
-              </Row>
-            </Rows>
+              </SeatsRow>
+            </Row>
           );
         })}
       </Wrapper>
@@ -67,18 +63,10 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-const Rows = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 const Row = styled.div`
   display: flex;
   align-items: center;
   position: relative;
-  background: #eee;
-  border-bottom: 1px solid #ddd;
 `;
 
 const RowLabel = styled.div`
@@ -86,15 +74,10 @@ const RowLabel = styled.div`
   width: 75px;
 `;
 
-const SeatWrapper = styled.button`
-  padding: 5px;
-  border: none;
-  cursor: pointer;
-`;
-
-const Seat = styled.img`
-  ${(prop) => prop.isBooked && "filter: grayscale(100%)"};
-  padding: 5px;
+const SeatsRow = styled.div`
+  padding: 10px;
+  background-color: #eee;
+  border-bottom: 1px solid #ddd;
 `;
 
 export default TicketWidget;

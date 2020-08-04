@@ -7,7 +7,6 @@ import TicketWidget from "./TicketWidget";
 
 function App() {
   const {
-    state,
     actions: { receiveSeatInfoFromServer },
   } = useContext(SeatContext);
 
@@ -22,7 +21,6 @@ function App() {
     <>
       <GlobalStyles />
       <TicketWidget />
-      {console.log(state.hasLoaded)}
     </>
   );
 }
