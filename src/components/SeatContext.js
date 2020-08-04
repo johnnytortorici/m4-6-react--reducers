@@ -10,7 +10,18 @@ const initialState = {
 };
 
 const reducer = (state, action) => {
-  // TODO
+  switch (action.type) {
+    case "receive-seat-info-from-server":
+      return {
+        ...state,
+        hasLoaded: true,
+        seats: action.seats,
+        numOfRows: action.numOfRows,
+        seatsPerRow: action.seatsPerRow,
+      };
+    default:
+      return state;
+  }
 };
 
 export const SeatProvider = ({ children }) => {
