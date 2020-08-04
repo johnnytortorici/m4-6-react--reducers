@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 
 import Tippy from "@tippy.js/react";
@@ -6,15 +6,22 @@ import "tippy.js/dist/tippy.css";
 import seat from "../assets/seat-available.svg";
 
 import { getRowName, getSeatNum } from "../helpers";
+import { BookingContext } from "./BookingContext";
 
 const Seat = ({ rowIndex, seatIndex, width, height, price, isBooked }) => {
+  const { beginBookingProcess } = useContext(BookingContext);
+
   return (
     <Tippy
       content={`Row ${getRowName(rowIndex)}, Seat ${getSeatNum(
         seatIndex
       )} - $${price}`}
     >
-      <Wrapper isBooked={isBooked} disabled={isBooked}>
+      <Wrapper
+        isBooked={isBooked}
+        disabled={isBooked}
+        onClick={beginBookingProcess}
+      >
         <SeatImg src={seat} alt="Seat" width={width} height={height} />
       </Wrapper>
     </Tippy>
