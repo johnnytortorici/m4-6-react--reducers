@@ -1,6 +1,8 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Tippy from "@tippy.js/react";
+import "tippy.js/dist/tippy.css";
 import seat from "../assets/seat-available.svg";
 import { SeatContext } from "./SeatContext";
 
@@ -13,39 +15,51 @@ const TicketWidget = () => {
   const numOfRows = state.numOfRows;
   const seatsPerRow = state.seatsPerRow;
 
-  // TODO: implement the loading spinner <CircularProgress />
-  // with the hasLoaded flag
+  if (!state.hasLoaded)
+    return (
+      <Wrapper>
+        <CircularProgress />
+      </Wrapper>
+    );
+  else
+    return (
+      <Wrapper>
+        {range(numOfRows).map((rowIndex) => {
+          const rowName = getRowName(rowIndex);
 
-  return (
-    <Wrapper>
-      {range(numOfRows).map((rowIndex) => {
-        const rowName = getRowName(rowIndex);
+          return (
+            <Rows>
+              <RowLabel>Row {rowName}</RowLabel>
+              <Row key={rowIndex}>
+                {range(seatsPerRow).map((seatIndex) => {
+                  const seatId = `${rowName}-${getSeatNum(seatIndex)}`;
 
-        return (
-          <Row key={rowIndex}>
-            <RowLabel>Row {rowName}</RowLabel>
-            {range(seatsPerRow).map((seatIndex) => {
-              const seatId = `${rowName}-${getSeatNum(seatIndex)}`;
-
-              return (
-                <SeatWrapper key={seatId}>
-                  {/* TODO: Render the actual <Seat /> */}
-                  <img src={seat} alt="Seat" />
-                </SeatWrapper>
-              );
-            })}
-          </Row>
-        );
-      })}
-    </Wrapper>
-  );
+                  return (
+                    <Tippy
+                      content={`Row ${rowName}, Seat ${getSeatNum(
+                        seatIndex
+                      )} - $${state.seats[seatId].price}`}
+                    >
+                      <SeatWrapper key={seatId}>
+                        <Seat
+                          src={seat}
+                          alt="Seat"
+                          isBooked={state.bookedSeats[seatId]}
+                        />
+                      </SeatWrapper>
+                    </Tippy>
+                  );
+                })}
+              </Row>
+            </Rows>
+          );
+        })}
+      </Wrapper>
+    );
 };
 
 const Wrapper = styled.div`
-  /* background: #eee; */
-  /* border: 1px solid #ccc; */
   height: 100vh;
-  border-radius: 3px;
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -53,21 +67,33 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
+const Rows = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 const Row = styled.div`
   display: flex;
   align-items: center;
   position: relative;
-
-  &:not(:last-of-type) {
-    border-bottom: 1px solid #ddd;
-  }
+  background: #eee;
+  border-bottom: 1px solid #ddd;
 `;
 
 const RowLabel = styled.div`
   font-weight: bold;
+  width: 75px;
 `;
 
-const SeatWrapper = styled.div`
+const SeatWrapper = styled.button`
+  padding: 5px;
+  border: none;
+  cursor: pointer;
+`;
+
+const Seat = styled.img`
+  ${(prop) => prop.isBooked && "filter: grayscale(100%)"};
   padding: 5px;
 `;
 
