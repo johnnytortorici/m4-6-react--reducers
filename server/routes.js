@@ -1,22 +1,39 @@
 /**
   Endpoints related to feeds (ordered sets of tweets)
 */
-const router = require('express').Router();
-const { delay } = require('./helpers');
+const router = require("express").Router();
+const { delay } = require("./helpers");
 
 const NUM_OF_ROWS = 8;
 const SEATS_PER_ROW = 12;
 
+// Code that is generating the seats.
+// ----------------------------------
+const seats = {};
+const row = ["A", "B", "C", "D", "E", "F", "G", "H"];
+for (let r = 0; r < row.length; r++) {
+  for (let s = 1; s < 13; s++) {
+    seats[`${row[r]}-${s}`] = {
+      price: 225,
+      isBooked: false,
+    };
+  }
+}
+// ----------------------------------
+
 let state;
 
-router.get('/api/seat-availability', (req, res) => {
+router.get("/api/seat-availability", async (req, res) => {
   if (!state) {
     state = {
       bookedSeats: randomlyBookSeats(30),
     };
   }
 
+  await delay(Math.random() * 3000);
+
   return res.json({
+    seats: seats,
     bookedSeats: state.bookedSeats,
     numOfRows: NUM_OF_ROWS,
     seatsPerRow: SEATS_PER_ROW,
@@ -25,7 +42,7 @@ router.get('/api/seat-availability', (req, res) => {
 
 let lastBookingAttemptSucceeded = false;
 
-router.post('/api/book-seat', async (req, res) => {
+router.post("/api/book-seat", async (req, res) => {
   const { seatId, creditCard, expiration } = req.body;
 
   if (!state) {
@@ -40,13 +57,13 @@ router.post('/api/book-seat', async (req, res) => {
 
   if (!creditCard || !expiration) {
     return res.status(400).json({
-      message: 'Please provide credit card information!',
+      message: "Please provide credit card information!",
     });
   }
 
   if (isAlreadyBooked) {
     return res.status(400).json({
-      message: 'This seat has already been booked!',
+      message: "This seat has already been booked!",
     });
   }
 
@@ -54,7 +71,7 @@ router.post('/api/book-seat', async (req, res) => {
     lastBookingAttemptSucceeded = !lastBookingAttemptSucceeded;
 
     return res.status(500).json({
-      message: 'An unknown error has occurred. Please try your request again.',
+      message: "An unknown error has occurred. Please try your request again.",
     });
   }
 
@@ -68,15 +85,11 @@ router.post('/api/book-seat', async (req, res) => {
 });
 
 //////// HELPERS
-const getRowName = rowIndex => {
+const getRowName = (rowIndex) => {
   return String.fromCharCode(65 + rowIndex);
 };
 
-// const getRowIndex = rowName => {
-//   return rowName.charCodeAt(0) - 65;
-// };
-
-const randomlyBookSeats = num => {
+const randomlyBookSeats = (num) => {
   const bookedSeats = {};
 
   while (num > 0) {
