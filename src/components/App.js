@@ -3,6 +3,8 @@ import React, { useContext, useEffect } from "react";
 import GlobalStyles from "./GlobalStyles";
 import { SeatContext } from "./SeatContext";
 
+import TicketWidget from "./TicketWidget";
+
 function App() {
   const {
     state,
@@ -19,7 +21,7 @@ function App() {
   return (
     <>
       <GlobalStyles />
-      TODO: write code
+      <TicketWidget />
       {console.log(state.hasLoaded)}
     </>
   );
